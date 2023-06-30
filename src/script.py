@@ -43,8 +43,6 @@ args = parser.parse_args()
 
 
 def predict_outcomes(df):
-    """Process the input data and write the predictions."""
-
     # The predict_outcomes function accepts a Pandas DataFrame as an argument
     # and returns a new DataFrame with two columns: nomem_encr and
     # prediction. The nomem_encr column in the new DataFrame replicates the
@@ -54,20 +52,110 @@ def predict_outcomes(df):
     # individual did not have a child during 2020-2022, while '1' implies that
     # they did.
 
-    # Keep 
-    keepcols = ['burgstat2019', 'leeftijd2019', 'woonvorm2019', 'oplmet2019', 'aantalki2019']
-    nomem_encr = df["nomem_encr"]
-    
+    #Column selection
+    import pandas as pd
+
+    #Split data
+    from sklearn.model_selection import train_test_split
+
+    #Column selection
+    from sklearn.compose import make_column_selector as selector
+    from sklearn.compose import ColumnTransformer
+
+    #Feature selection
+    from sklearn.feature_selection import SelectKBest, f_classif
+    #Model
+    from sklearn.preprocessing import OneHotEncoder
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import make_pipeline
+    from sklearn.pipeline import Pipeline
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.neighbors import KNeighborsClassifier 
+    from sklearn.model_selection import cross_validate
+    from sklearn.ensemble import GradientBoostingClassifier
+
+    keepcols = ['nomem_encr',
+            'gebjaar', 
+            'geslacht',
+            'herkomstgroep2017', 
+            'herkomstgroep2018', 
+            'herkomstgroep2019', 
+            'oplmet2017', 
+            'oplmet2018', 
+            'oplmet2019', 
+            'aantalki2017', 
+            'aantalki2018', 
+            'aantalki2019', 
+            'positie2017',
+            'positie2018', 
+            'positie2019', 
+            'leeftijd2017',
+            'leeftijd2018', 
+            'leeftijd2019', 
+            'aantalhh2017', 
+            'aantalhh2018', 
+            'aantalhh2019', 
+            'lftdhhh2017',
+            'lftdhhh2018', 
+            'lftdhhh2019',
+            'partner2017',
+            'partner2018',
+            'partner2019',
+            'belbezig2017', 
+            'belbezig2018',
+            'belbezig2019',
+            'brutohh_f2017',
+            'brutohh_f2018', 
+            'brutohh_f2019',
+            #'cf17j454', 
+            'cf18k454',
+            #'cf19l454', 
+            #'cf17j455', 
+            'cf18k455',
+            #'cf19l455',
+            #'cf17j130', 
+            'cf18k130',
+            #'cf19l130',
+            #'cf17j129',
+            'cf18k129',
+            #'cf19l129',
+            'cf17j128',
+            'cf18k128',
+            'cf19l128', 
+            #'cf17j407', 
+            #'cf18k407',
+            #'cf19l407', 
+            #'cf17j408', 
+            #'cf18k408',
+            #'cf19l408',
+           ]
     df = df.loc[:, keepcols]
+
+
+    # #### Categorical versus Numerical features
+    #Categorical variables 
+    categorical_columns_selector = selector(dtype_include=object)
+    categorical_columns = categorical_columns_selector(df)
+
+    #Numerical variables
+    numerical_columns_selector = selector(dtype_exclude=object)
+    numerical_columns = numerical_columns_selector(df)
+
+    for col in numerical_columns:
+        col_mean = df[col].mean()
+        df[col] = df[col].fillna(col_mean)
+
+    for col in categorical_columns:
+       df[col] = df[col].fillna('none')
     
     # Load your trained model from the models directory
-    model_path = os.path.join(os.path.dirname(__file__), "..", "models", "model.joblib")
+    model_path = os.path.join(os.path.dirname(__file__), "..", "models", "GBS_feature_selection.joblib")
     model = load(model_path)
 
     # Use your trained model for prediction
     predictions = model.predict(df)
     # Return the result as a Pandas DataFrame with the columns "nomem_encr" and "prediction"
-    return pd.concat([nomem_encr, pd.Series(predictions, name="prediction")], axis=1)
+    return pd.concat([df['nomem_encr'], pd.Series(predictions, name="prediction")], axis=1)
 
 
 def predict(input_path, output):
