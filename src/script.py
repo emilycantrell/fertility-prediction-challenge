@@ -43,6 +43,9 @@ args = parser.parse_args()
 
 
 def predict_outcomes(df):
+    def predict_outcomes(df):
+    """Process the input data and write the predictions."""
+
     # The predict_outcomes function accepts a Pandas DataFrame as an argument
     # and returns a new DataFrame with two columns: nomem_encr and
     # prediction. The nomem_encr column in the new DataFrame replicates the
@@ -149,7 +152,7 @@ def predict_outcomes(df):
        df[col] = df[col].fillna('none')
     
     # Load your trained model from the models directory
-    model_path = os.path.join(os.path.dirname(__file__), "..", "models", "GBS_feature_selection.joblib")
+    model_path = os.path.join(os.path.dirname(__file__), "..", "models", "GBS_feature_selection_secret_weapon.joblib")
     model = load(model_path)
 
     # Use your trained model for prediction
