@@ -55,7 +55,7 @@ def predict_outcomes(df):
     # they did.
 
     #Column selection
-    import pandas as pd
+    #import pandas as pd
 
     #Split data
     from sklearn.model_selection import train_test_split
